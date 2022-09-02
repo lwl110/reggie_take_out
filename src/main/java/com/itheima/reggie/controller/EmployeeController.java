@@ -1,19 +1,21 @@
 package com.itheima.reggie.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.itheima.reggie.common.R;
 import com.itheima.reggie.entity.Employee;
 import com.itheima.reggie.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.DigestUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 @Slf4j
 @RestController
@@ -81,8 +83,8 @@ public class EmployeeController {
         //设置初始密码123456，需要进行md5加密处理
         employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
 
-        employee.setCreateTime(LocalDateTime.now());
-        employee.setUpdateTime(LocalDateTime.now());
+        employee.setCreateTime(new Date());
+        employee.setUpdateTime(new Date());
 
         //获得当前登录用户的id
         Long empId = (Long) request.getSession().getAttribute("employee");
@@ -94,4 +96,24 @@ public class EmployeeController {
 
         return R.success("新增员工成功");
     }
+
+    @GetMapping("/page")
+    public R<Page> page(int page, int pageSize, String name){
+        log.info("page = {},pageSize = {},name = {}",page,pageSize,name);
+
+        //构造分页构造器
+        Page pageInfo = new Page(page, pageSize);
+
+        //构造条件构造器
+        LambdaQueryWrapper queryWrapper = new LambdaQueryWrapper();
+
+        //添加过滤条件
+        queryWrapper.like(StringUtils.isNotEmpty(name),Employee::getName,name);
+
+        //执行查询
+        employeeService.page(pageInfo,queryWrapper);
+
+        return R.success(pageInfo);
+    }
+
 }
