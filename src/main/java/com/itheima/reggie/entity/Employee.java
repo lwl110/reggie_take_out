@@ -35,6 +35,7 @@ public class Employee {
 
     private Integer status;
 
+    //将时间转换为自己要的时间格式向前端发送(具体还是json数据不变)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 

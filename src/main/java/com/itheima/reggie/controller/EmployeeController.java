@@ -1,6 +1,7 @@
 package com.itheima.reggie.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.itheima.reggie.common.R;
 import com.itheima.reggie.entity.Employee;
@@ -17,6 +18,9 @@ import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
+/**
+ * 员工信息 前端控制器
+ */
 @Slf4j
 @RestController
 @RequestMapping("/employee")
@@ -97,6 +101,13 @@ public class EmployeeController {
         return R.success("新增员工成功");
     }
 
+    /**
+     * 分页查询
+     * @param page
+     * @param pageSize
+     * @param name
+     * @return
+     */
     @GetMapping("/page")
     public R<Page> page(int page, int pageSize, String name){
         log.info("page = {},pageSize = {},name = {}",page,pageSize,name);
@@ -104,16 +115,31 @@ public class EmployeeController {
         //构造分页构造器
         Page pageInfo = new Page(page, pageSize);
 
-        //构造条件构造器
-        LambdaQueryWrapper queryWrapper = new LambdaQueryWrapper();
-
-        //添加过滤条件
-        queryWrapper.like(StringUtils.isNotEmpty(name),Employee::getName,name);
+        //过滤条件
+        LambdaQueryWrapper<Employee> queryWrapper = Wrappers.lambdaQuery(Employee.class)
+                                                            .like(StringUtils.isNotEmpty(name), Employee::getName, name);
 
         //执行查询
         employeeService.page(pageInfo,queryWrapper);
 
         return R.success(pageInfo);
+    }
+
+    /**
+     * 根据id修改员工信息
+     * @param employee
+     * @return
+     */
+    @PutMapping
+    public R<String> update(HttpServletRequest request,@RequestBody Employee employee){
+        log.info(employee.toString());
+
+        Long empId = (Long)request.getSession().getAttribute("employee");
+        employee.setUpdateTime(new Date());
+        employee.setUpdateUser(empId);
+        employeeService.updateById(employee);
+
+        return R.success("员工信息修改成功");
     }
 
 }
