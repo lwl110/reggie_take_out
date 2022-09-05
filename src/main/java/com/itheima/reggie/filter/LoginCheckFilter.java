@@ -2,6 +2,7 @@ package com.itheima.reggie.filter;
 
 import cn.hutool.core.text.AntPathMatcher;
 import com.alibaba.fastjson.JSON;
+import com.itheima.reggie.common.BaseContext;
 import com.itheima.reggie.common.R;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,6 +48,11 @@ public class LoginCheckFilter implements Filter {
 
         //5.判断登录状态，如果已登录，则直接放行
         if(request.getSession().getAttribute("employee") != null){
+
+            //获取并保存用户id
+            Long empId = (Long) request.getSession().getAttribute("employee");
+            BaseContext.setCurrentId(empId);
+
             chain.doFilter(request,response);
             return;
         }

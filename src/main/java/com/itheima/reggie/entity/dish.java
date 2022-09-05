@@ -1,39 +1,46 @@
 package com.itheima.reggie.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
- *员工实体
+ * 菜品管理
  */
 @Data
-public class Employee {
+public class dish implements Serializable {
 
-    private static final long serialVersionUID=1L;
+    private static final Long serialVersionUID=1L;
 
-    @TableId(value = "id", type = IdType.ID_WORKER)
     private Long id;
 
+    //菜品名称
     private String name;
 
-    private String username;
+    //菜品分类id
+    private Long categoryId;
 
-    private String password;
+    //菜品价格
+    private Double price;
 
-    private String phone;
+    //商品码
+    private String code;
 
-    private String sex;
+    //图片
+    private String image;
 
-    private String idNumber; //身份证号码
+    //描述信息
+    private String description;
 
+    //0：停售  1：起售
     private Integer status;
+
+    //顺序
+    private Integer sort;
 
     //将时间转换为自己要的时间格式向前端发送(具体还是json数据不变)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -49,4 +56,7 @@ public class Employee {
 
     @TableField(fill = FieldFill.INSERT_UPDATE) //插入和更新时填充字段
     private Long updateUser;
+
+    //是否删除
+    private Integer is_deleted;
 }

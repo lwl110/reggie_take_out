@@ -1,39 +1,32 @@
 package com.itheima.reggie.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.models.auth.In;
 import lombok.Data;
 
-import java.time.LocalDateTime;
+import java.io.Serializable;
 import java.util.Date;
 
 /**
- *员工实体
+ * 分类管理
  */
 @Data
-public class Employee {
+public class Category implements Serializable {
 
     private static final long serialVersionUID=1L;
 
-    @TableId(value = "id", type = IdType.ID_WORKER)
     private Long id;
 
+    //类型 1 菜品分类 2 套餐分类
+    private Integer type;
+
+    //分类名称
     private String name;
 
-    private String username;
-
-    private String password;
-
-    private String phone;
-
-    private String sex;
-
-    private String idNumber; //身份证号码
-
-    private Integer status;
+    //顺序
+    private Integer sort;
 
     //将时间转换为自己要的时间格式向前端发送(具体还是json数据不变)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
