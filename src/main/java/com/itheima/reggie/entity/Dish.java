@@ -12,7 +12,7 @@ import java.util.Date;
  * 菜品管理
  */
 @Data
-public class dish implements Serializable {
+public class Dish implements Serializable {
 
     private static final Long serialVersionUID=1L;
 

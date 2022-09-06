@@ -3,11 +3,13 @@ package com.itheima.reggie.entity;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
 
-public class setmeal implements Serializable {
+@Data
+public class Setmeal implements Serializable {
 
     private static final Long serialVersionUID=1L;
 

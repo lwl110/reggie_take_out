@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.itheima.reggie.common.R;
 import com.itheima.reggie.entity.Category;
+import com.itheima.reggie.entity.Dish;
 import com.itheima.reggie.entity.Employee;
 import com.itheima.reggie.service.CategoryService;
 import com.itheima.reggie.service.EmployeeService;
@@ -68,7 +69,16 @@ public class CategoryController {
     public R<String> put(@RequestBody Category category){
         categoryService.updateById(category);
 
-        return R.success("修改成功");
+        return R.success("修改分类信息成功");
+    }
+
+    @GetMapping("/list")
+    public R<String> list(int type){
+        LambdaQueryWrapper<Category> eq = Wrappers.lambdaQuery(Category.class)
+                .eq(Category::getType, type);
+        categoryService.list(eq);
+
+        return R.success("菜品分类");
     }
 
     /**
