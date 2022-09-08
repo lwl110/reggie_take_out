@@ -51,5 +51,7 @@ mybatis-plus:
     db-config:
       id-type: ID_WORKER
 
+reggie:
+  path: D:\imgs\
 
 

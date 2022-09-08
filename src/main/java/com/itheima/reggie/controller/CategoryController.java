@@ -14,6 +14,8 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 分类管理
  */
@@ -72,14 +74,35 @@ public class CategoryController {
         return R.success("修改分类信息成功");
     }
 
+    /**
+     * 菜品分类下拉列表 方案一：
+     * @param type
+     * @return
+     */
     @GetMapping("/list")
-    public R<String> list(int type){
+    public R<List<Category>> list(int type){
         LambdaQueryWrapper<Category> eq = Wrappers.lambdaQuery(Category.class)
-                .eq(Category::getType, type);
-        categoryService.list(eq);
+                .eq(Category::getType, type).orderByAsc(Category::getSort);
 
-        return R.success("菜品分类");
+        List<Category> list = categoryService.list(eq);
+
+        return R.success(list);
     }
+
+    /**
+     * 菜品分类下拉列表 方案二：
+     * @param category
+     * @return
+     */
+//    @GetMapping("/list")
+//    public R<List<Category>> list(Category category){
+//        LambdaQueryWrapper<Category> eq = Wrappers.lambdaQuery(Category.class)
+//                .eq(Category::getType, category.getType()).orderByAsc(Category::getSort);
+//
+//        List<Category> list = categoryService.list(eq);
+//
+//        return R.success(list);
+//    }
 
     /**
      * 删除操作
