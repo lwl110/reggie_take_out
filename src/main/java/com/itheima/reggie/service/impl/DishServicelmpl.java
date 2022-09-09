@@ -54,6 +54,7 @@ public class DishServicelmpl extends ServiceImpl<DishMapper, Dish> implements Di
      * @return
      */
     @Override
+    @Transactional
     public DishDto getByIdWithFlavor(Long id) {
         //查询菜品基本信息，从dish表中查询
         Dish dish = this.getById(id);
@@ -77,17 +78,25 @@ public class DishServicelmpl extends ServiceImpl<DishMapper, Dish> implements Di
      * @param dishDto
      */
     @Override
+    @Transactional
     public void updateWithFlavor(DishDto dishDto) {
         //更新dish表的基本信息
         this.updateById(dishDto);
 
+        //清理当前菜品对应的口味数据---dish_flavor表的delete操作
         LambdaQueryWrapper<DishFlavor> eq = Wrappers.lambdaQuery(DishFlavor.class)
                 .eq(DishFlavor::getDishId, dishDto.getId());
 
-        //清理当前菜品对应的口味数据---dish_flavor表的delete操作
-
+        dishFlavorService.remove(eq);
 
         //添加当前提交过来的口味数据---dish_flavor表的insert操作
+        List<DishFlavor> flavors = dishDto.getFlavors();
 
+        flavors = flavors.stream().map((item) -> {
+            item.setDishId(dishDto.getId());
+            return item;
+        }).collect(Collectors.toList());
+
+        dishFlavorService.saveBatch(flavors);
     }
 }

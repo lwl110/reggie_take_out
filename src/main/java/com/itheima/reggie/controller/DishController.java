@@ -115,8 +115,27 @@ public class DishController {
      */
     @PutMapping
     public R<String> update(@RequestBody DishDto dishDto){
-        dishService.saveWithFlavor(dishDto);
+        dishService.updateWithFlavor(dishDto);
 
         return R.success("修改菜品成功");
+    }
+
+    /**
+     * 根据条件查询对应的菜品数据
+     * @param dish
+     * @return
+     */
+    @GetMapping("list")
+    public R<List<Dish>> list(Dish dish){
+
+        //构造查询条件,并添加排序条件,再查询状态为1（起售状态）的菜品
+        LambdaQueryWrapper<Dish> dishLambdaQueryWrapper = Wrappers.lambdaQuery(Dish.class)
+                .eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId())
+                .eq(Dish::getStatus,1)
+                .orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
+
+        List<Dish> list = dishService.list(dishLambdaQueryWrapper);
+
+        return R.success(list);
     }
 }
