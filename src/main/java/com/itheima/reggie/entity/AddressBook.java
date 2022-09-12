@@ -7,36 +7,56 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.Date;
 
+/**
+ * 地址簿
+ */
 @Data
-public class Setmeal implements Serializable {
+public class AddressBook implements Serializable {
 
-    private static final Long serialVersionUID=1L;
+    private static final long serialVersionUID=1l;
 
     private Long id;
 
-    //菜品分类id
-    private Long categoryId;
+    //用户id
+    private Long userId;
 
-    //套餐名称
-    private String name;
+    //收货人
+    private String consignee;
 
-    //套餐价格
-    private BigDecimal price;
+    //性别 0 女 1 男
+    private Integer sex;
 
-    //状态：0：停用  1：启用
-    private Integer status;
+    //手机号
+    private String phone;
 
-    //编码
-    private String code;
+    //省级区划编号
+    private String provinceCode;
 
-    //描述信息
-    private String description;
+    //省级名称
+    private String provinceName;
 
-    //图片
-    private String image;
+    //市级区划编号
+    private String cityCode;
+
+    //市级名称
+    private String cityName;
+
+    //区级区划编号
+    private String districtCode;
+
+    //区级名称
+    private String districtName;
+
+    //详细地址
+    private String detail;
+
+    //标签
+    private String label;
+
+    //默认 0 否 1 是
+    private Integer isDefault;
 
     //将时间转换为自己要的时间格式向前端发送(具体还是json数据不变)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

@@ -6,16 +6,16 @@ function loginApi(data) {
     })
   }
 
-function getPhoneCode(data) {
+function sendMsgApi(data) {
     return $axios({
-        'url': '/user/code',
-        'method': 'get',
-        params:{...data}
+        'url': '/user/sendMsg',
+        'method': 'post',
+        data
     })
 }
-function loginoutApi() {
+function logoutApi() {
   return $axios({
-    'url': '/user/loginout',
+    'url': '/user/logout',
     'method': 'post',
   })
 }

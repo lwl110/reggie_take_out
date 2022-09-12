@@ -22,6 +22,8 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
         //自动填充用户id
         metaObject.setValue("createUser", BaseContext.getCurrentId());
         metaObject.setValue("updateUser", BaseContext.getCurrentId());
+        //自动填充逻辑删除：0 表示未删除 1 表示删除
+        metaObject.setValue("isDeleted",0);
     }
 
     /**

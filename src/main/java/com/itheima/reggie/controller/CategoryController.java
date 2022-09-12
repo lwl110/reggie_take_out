@@ -75,34 +75,20 @@ public class CategoryController {
     }
 
     /**
-     * 菜品分类下拉列表 方案一：
-     * @param type
+     * 客户端的菜品分类下拉列表、获取所有的菜品分类
+     * @param category
      * @return
      */
     @GetMapping("/list")
-    public R<List<Category>> list(int type){
+    public R<List<Category>> list(Category category){
         LambdaQueryWrapper<Category> eq = Wrappers.lambdaQuery(Category.class)
-                .eq(Category::getType, type).orderByAsc(Category::getSort);
+                .eq(category.getType() != null,Category::getType, category.getType())
+                .orderByAsc(Category::getSort);
 
         List<Category> list = categoryService.list(eq);
 
         return R.success(list);
     }
-
-    /**
-     * 菜品分类下拉列表 方案二：
-     * @param category
-     * @return
-     */
-//    @GetMapping("/list")
-//    public R<List<Category>> list(Category category){
-//        LambdaQueryWrapper<Category> eq = Wrappers.lambdaQuery(Category.class)
-//                .eq(Category::getType, category.getType()).orderByAsc(Category::getSort);
-//
-//        List<Category> list = categoryService.list(eq);
-//
-//        return R.success(list);
-//    }
 
     /**
      * 删除操作

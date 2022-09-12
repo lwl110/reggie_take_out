@@ -126,16 +126,41 @@ public class DishController {
      * @return
      */
     @GetMapping("list")
-    public R<List<Dish>> list(Dish dish){
-
+    public R<List<DishDto>> list(Dish dish){
         //构造查询条件,并添加排序条件,再查询状态为1（起售状态）的菜品
         LambdaQueryWrapper<Dish> dishLambdaQueryWrapper = Wrappers.lambdaQuery(Dish.class)
                 .eq(dish.getCategoryId() != null, Dish::getCategoryId, dish.getCategoryId())
                 .eq(Dish::getStatus,1)
-                .orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
+                .orderByAsc(Dish::getSort)
+                .orderByDesc(Dish::getUpdateTime);
 
         List<Dish> list = dishService.list(dishLambdaQueryWrapper);
 
-        return R.success(list);
+        List<DishDto> collect = list.stream().map((item) -> {
+            DishDto dishDto = new DishDto();
+
+            BeanUtils.copyProperties(item, dishDto);
+
+            Long categoryId = item.getCategoryId();  //分类id
+
+            //根据id查询分类对象
+            Category byId = categoryService.getById(categoryId);
+
+            if (byId != null) {
+                String byIdName = byId.getName();
+                dishDto.setCategoryName(byIdName);
+            }
+
+            //当前菜品的id
+            Long dishId = item.getId();
+            LambdaQueryWrapper<DishFlavor> eq = Wrappers.lambdaQuery(DishFlavor.class)
+                    .eq(DishFlavor::getDishId, dishId);
+            List<DishFlavor> dishFlavorsList = dishFlavorService.list(eq);
+            dishDto.setFlavors(dishFlavorsList);
+
+            return dishDto;
+        }).collect(Collectors.toList());
+
+        return R.success(collect);
     }
 }

@@ -5,10 +5,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.itheima.reggie.common.R;
 import com.itheima.reggie.dto.SetmealDto;
-import com.itheima.reggie.entity.Category;
-import com.itheima.reggie.entity.Dish;
-import com.itheima.reggie.entity.Setmeal;
-import com.itheima.reggie.entity.SetmealDish;
+import com.itheima.reggie.entity.*;
 import com.itheima.reggie.service.CategoryService;
 import com.itheima.reggie.service.SetmealDishService;
 import com.itheima.reggie.service.SetmealService;
@@ -97,6 +94,17 @@ public class SetmealController {
         setmealService.saveWithDish(setmealDto);
 
         return R.success("新增套餐成功");
+    }
+
+    /**
+     * 获取菜品分类对应的套餐
+     * @return
+     */
+    @GetMapping("list")
+    public R<List<Setmeal>> list(){
+        List<Setmeal> list = setmealService.list();
+
+        return R.success(list);
     }
 
     /**

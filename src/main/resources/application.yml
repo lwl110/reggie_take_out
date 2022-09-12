@@ -33,6 +33,13 @@ spring:
       username: root
       password: 123456
 
+  mail:
+    host: smtp.qq.com #不同的邮箱不一致，请自行百度查询
+    port: 587 #qq邮箱默认
+    username: 1916403680@qq.com #发送邮箱
+    password: zsxhbrjtylbibccc #授权码
+    auth: false
+
   redis:
     host: localhost # 本地IP 或是 虚拟机IP
     port: 6379
@@ -49,9 +56,12 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
     db-config:
+      logic-delete-value: 1 # 逻辑已删除值(默认为 1)
+      logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
       id-type: ID_WORKER
 
 reggie:
   path: D:\imgs\
+
 
 

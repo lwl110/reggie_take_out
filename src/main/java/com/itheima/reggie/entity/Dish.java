@@ -2,10 +2,12 @@ package com.itheima.reggie.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 /**
@@ -25,7 +27,7 @@ public class Dish implements Serializable {
     private Long categoryId;
 
     //菜品价格
-    private Double price;
+    private BigDecimal price;
 
     //商品码
     private String code;
@@ -57,6 +59,8 @@ public class Dish implements Serializable {
     @TableField(fill = FieldFill.INSERT_UPDATE) //插入和更新时填充字段
     private Long updateUser;
 
-    //是否删除
+    //逻辑删除（0 未删除、1 删除）
+    @TableLogic(value = "0", delval = "1")
+    @TableField(fill = FieldFill.INSERT)  //插入时填充字段
     private Integer isDeleted;
 }
