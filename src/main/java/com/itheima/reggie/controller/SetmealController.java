@@ -97,12 +97,17 @@ public class SetmealController {
     }
 
     /**
-     * 获取菜品分类对应的套餐
+     * 根据条件查询套餐数据
      * @return
      */
     @GetMapping("list")
-    public R<List<Setmeal>> list(){
-        List<Setmeal> list = setmealService.list();
+    public R<List<Setmeal>> list(Setmeal setmeal){
+        LambdaQueryWrapper<Setmeal> eq = Wrappers.lambdaQuery(Setmeal.class)
+                .eq(setmeal.getCategoryId() != null,Setmeal::getCategoryId,setmeal.getCategoryId())
+                .eq(setmeal.getStatus() != null,Setmeal::getStatus, setmeal.getStatus())
+                .orderByDesc(Setmeal::getUpdateTime);
+
+        List<Setmeal> list = setmealService.list(eq);
 
         return R.success(list);
     }

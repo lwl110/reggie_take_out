@@ -5,7 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.reflection.MetaObject;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.Objects;
+import java.util.function.Supplier;
 
 @Component
 @Slf4j
@@ -17,13 +20,15 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
      */
     @Override
     public void insertFill(MetaObject metaObject) {
-        metaObject.setValue("createTime",new Date());
-        metaObject.setValue("updateTime",new Date());
+        //自动填充时间
+        this.strictInsertFill(metaObject,"createTime", LocalDateTime.class,LocalDateTime.now());
+        this.strictInsertFill(metaObject, "updateTime", LocalDateTime.class, LocalDateTime.now());
+
         //自动填充用户id
-        metaObject.setValue("createUser", BaseContext.getCurrentId());
-        metaObject.setValue("updateUser", BaseContext.getCurrentId());
-        //自动填充逻辑删除：0 表示未删除 1 表示删除
-        metaObject.setValue("isDeleted",0);
+        this.strictInsertFill(metaObject,"createUser", Long.class,BaseContext.getCurrentId());
+        this.strictInsertFill(metaObject,"updateUser", Long.class,BaseContext.getCurrentId());
+
+        this.strictInsertFill(metaObject,"isDeleted", Integer.class,0);
     }
 
     /**
@@ -32,8 +37,11 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
      */
     @Override
     public void updateFill(MetaObject metaObject) {
-        metaObject.setValue("updateTime",new Date());
+        //针对updateById方法导致自动填充失效，用setFieldValByName方法
+//        this.strictUpdateFill(metaObject, "updateTime", LocalDateTime.class, LocalDateTime.now());
+        this.setFieldValByName("updateTime", LocalDateTime.now(),metaObject);
+
         //自动填充用户id
-        metaObject.setValue("updateUser",BaseContext.getCurrentId());
+        this.setFieldValByName("updateUser", BaseContext.getCurrentId(),metaObject);
     }
 }

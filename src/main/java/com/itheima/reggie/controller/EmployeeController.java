@@ -135,8 +135,8 @@ public class EmployeeController {
         log.info(employee.toString());
 
         Long empId = (Long)request.getSession().getAttribute("employee");
-        employee.setUpdateTime(new Date());
-        employee.setUpdateUser(empId);
+//        employee.setUpdateTime(LocalDateTime.now());
+//        employee.setUpdateUser(empId);
         employeeService.updateById(employee);
 
         return R.success("员工信息修改成功");

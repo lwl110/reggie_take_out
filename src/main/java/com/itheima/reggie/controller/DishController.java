@@ -153,6 +153,7 @@ public class DishController {
 
             //当前菜品的id
             Long dishId = item.getId();
+            //获取当前菜品口味
             LambdaQueryWrapper<DishFlavor> eq = Wrappers.lambdaQuery(DishFlavor.class)
                     .eq(DishFlavor::getDishId, dishId);
             List<DishFlavor> dishFlavorsList = dishFlavorService.list(eq);

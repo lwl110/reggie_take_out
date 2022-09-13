@@ -41,8 +41,39 @@ public class ShoppingCartController {
      * @return
      */
     @PostMapping("/add")
-    public R<String> add(@RequestBody ShoppingCart shoppingCart){
-        return null;
+    public R<ShoppingCart> add(@RequestBody ShoppingCart shoppingCart){
+        //设置用户id，指定当前是哪个用户的购物车数据
+        Long currentId = BaseContext.getCurrentId();
+        shoppingCart.setUserId(currentId);
+
+        LambdaQueryWrapper<ShoppingCart> shoppingCartLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        shoppingCartLambdaQueryWrapper.eq(ShoppingCart::getUserId, currentId);
+
+        Long dishId = shoppingCart.getDishId();
+        if(dishId != null){
+            //添加到购物车的是菜品
+            shoppingCartLambdaQueryWrapper.eq(ShoppingCart::getDishId, dishId);
+        }else{
+            //添加到购物车的是套餐
+            shoppingCartLambdaQueryWrapper.eq(ShoppingCart::getSetmealId, shoppingCart.getSetmealId());
+        }
+
+        //查询当前菜品或者套餐是否在购物车中
+        ShoppingCart one = shoppingCartService.getOne(shoppingCartLambdaQueryWrapper);
+
+        if(one != null){
+            //如果已经存在，就在原来数量的基础上加一
+            Integer number = one.getNumber();
+            one.setNumber(number + 1);
+            shoppingCartService.updateById(one);
+        }else{
+            //如果不存在，则添加到购物车，数量默认就是一
+            shoppingCart.setNumber(1);
+            shoppingCartService.save(shoppingCart);
+            one = shoppingCart;
+        }
+
+        return R.success(one);
     }
 
     /**
@@ -52,6 +83,8 @@ public class ShoppingCartController {
      */
     @PostMapping("/sub")
     public R<String> sub(@RequestBody ShoppingCart shoppingCart){
+//        shoppingCartService.updateById()
+
         return null;
     }
 }
