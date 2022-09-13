@@ -56,5 +56,5 @@ public class SetmealDish implements Serializable {
     //逻辑删除（0 未删除、1 删除）
     @TableLogic(value = "0", delval = "1")
     @TableField(fill = FieldFill.INSERT)  //插入时填充字段
-    private Integer is_deleted;
+    private Integer isDeleted;
 }
