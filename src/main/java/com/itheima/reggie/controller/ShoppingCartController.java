@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.itheima.reggie.common.BaseContext;
 import com.itheima.reggie.common.R;
+import com.itheima.reggie.entity.Setmeal;
 import com.itheima.reggie.entity.ShoppingCart;
 import com.itheima.reggie.service.ShoppingCartService;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +48,7 @@ public class ShoppingCartController {
         shoppingCart.setUserId(currentId);
 
         LambdaQueryWrapper<ShoppingCart> shoppingCartLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        shoppingCartLambdaQueryWrapper.eq(ShoppingCart::getUserId, currentId);
+        shoppingCartLambdaQueryWrapper.eq(currentId != null,ShoppingCart::getUserId, currentId);
 
         Long dishId = shoppingCart.getDishId();
         if(dishId != null){
@@ -55,7 +56,7 @@ public class ShoppingCartController {
             shoppingCartLambdaQueryWrapper.eq(ShoppingCart::getDishId, dishId);
         }else{
             //添加到购物车的是套餐
-            shoppingCartLambdaQueryWrapper.eq(ShoppingCart::getSetmealId, shoppingCart.getSetmealId());
+            shoppingCartLambdaQueryWrapper.eq(shoppingCart.getSetmealId() != null,ShoppingCart::getSetmealId, shoppingCart.getSetmealId());
         }
 
         //查询当前菜品或者套餐是否在购物车中
@@ -83,8 +84,41 @@ public class ShoppingCartController {
      */
     @PostMapping("/sub")
     public R<String> sub(@RequestBody ShoppingCart shoppingCart){
-//        shoppingCartService.updateById()
+        LambdaQueryWrapper<ShoppingCart> eq = Wrappers.lambdaQuery(ShoppingCart.class)
+                .eq(shoppingCart.getUserId() != null, ShoppingCart::getUserId, BaseContext.getCurrentId())
+                .eq(shoppingCart.getDishId() != null,ShoppingCart::getDishId,shoppingCart.getDishId())
+                .eq(shoppingCart.getSetmealId() != null,ShoppingCart::getSetmealId,shoppingCart.getSetmealId());
 
-        return null;
+        ShoppingCart one = shoppingCartService.getOne(eq);
+
+        Integer number = one.getNumber();
+
+        if(number == 1){
+            shoppingCartService.remove(eq);
+        }
+
+        if(number > 1){
+            number -= 1;
+            one.setNumber(number);
+            shoppingCartService.update(one, eq);
+        }
+
+        return R.success("修改成功");
+    }
+
+    /**
+     * 清空购物车
+     * @return
+     */
+    @DeleteMapping("/clean")
+    public R<String> clean(){
+        Long currentId = BaseContext.getCurrentId();
+
+        LambdaQueryWrapper<ShoppingCart> eq = Wrappers.lambdaQuery(ShoppingCart.class)
+                .eq(currentId != null, ShoppingCart::getUserId, currentId);
+
+        shoppingCartService.remove(eq);
+
+        return R.success("清空购物车成功");
     }
 }

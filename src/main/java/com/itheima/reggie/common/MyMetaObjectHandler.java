@@ -21,12 +21,12 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
     @Override
     public void insertFill(MetaObject metaObject) {
         //自动填充时间
-        this.strictInsertFill(metaObject,"createTime", LocalDateTime.class,LocalDateTime.now());
-        this.strictInsertFill(metaObject, "updateTime", LocalDateTime.class, LocalDateTime.now());
+        this.strictInsertFill(metaObject,"createTime", LocalDateTime.class, LocalDateTime.now());
+        this.strictInsertFill( metaObject,"updateTime",LocalDateTime.class, LocalDateTime.now());
 
         //自动填充用户id
         this.strictInsertFill(metaObject,"createUser", Long.class,BaseContext.getCurrentId());
-        this.strictInsertFill(metaObject,"updateUser", Long.class,BaseContext.getCurrentId());
+        this.strictInsertFill(metaObject,"updateUser",Long.class,BaseContext.getCurrentId());
 
         this.strictInsertFill(metaObject,"isDeleted", Integer.class,0);
     }
