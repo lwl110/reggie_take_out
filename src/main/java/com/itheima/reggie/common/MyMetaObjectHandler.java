@@ -28,7 +28,12 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
         this.strictInsertFill(metaObject,"createUser", Long.class,BaseContext.getCurrentId());
         this.strictInsertFill(metaObject,"updateUser",Long.class,BaseContext.getCurrentId());
 
+        //自动填充删除逻辑 0存在 1删除
         this.strictInsertFill(metaObject,"isDeleted", Integer.class,0);
+
+        //自动填充下单时间和结账时间
+        this.strictInsertFill(metaObject,"orderTime",LocalDateTime.class,LocalDateTime.now());
+        this.strictInsertFill(metaObject,"checkoutTime",LocalDateTime.class,LocalDateTime.now());
     }
 
     /**
