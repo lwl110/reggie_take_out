@@ -2,8 +2,10 @@ package com.itheima.reggie.controller;
 
 import cn.hutool.extra.spring.SpringUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.itheima.reggie.common.BaseContext;
 import com.itheima.reggie.common.R;
 import com.itheima.reggie.dto.DishDto;
 import com.itheima.reggie.entity.Category;
@@ -163,5 +165,22 @@ public class DishController {
         }).collect(Collectors.toList());
 
         return R.success(collect);
+    }
+
+    /**
+     * 商品起售停售功能 status：0 停售 1 起售
+     * @param ids
+     * @return
+     */
+    @PostMapping("/status/${status}")
+    public R<String> status(@PathVariable int status,@PathVariable List<Long> ids){
+            LambdaUpdateWrapper<Dish> set = Wrappers.lambdaUpdate(Dish.class)
+                    .eq(ids != null, Dish::getId, ids)
+                    .ne(Dish::getStatus,0)
+                    .set(Dish::getStatus, 0);
+
+            dishService.update(set);
+
+        return R.success("商品已更改为停售");
     }
 }

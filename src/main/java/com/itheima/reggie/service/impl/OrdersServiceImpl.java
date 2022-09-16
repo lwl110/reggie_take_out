@@ -36,6 +36,9 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
     @Autowired
     private OrderDetailService orderDetailService;
 
+    @Autowired
+    private EmployeeService employeeService;
+
     /**
      * 用户下单
      * @param orders
@@ -57,6 +60,7 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
 
         //查询用户数据
         User byId = userService.getById(currentId);
+        Employee employeeServiceById = employeeService.getById(currentId);
 
         //查询地址数据
         Long addressBookId = orders.getAddressBookId();
@@ -91,7 +95,11 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
         orders.setAmount(new BigDecimal(amount.get()));
         orders.setUserId(currentId);
         orders.setNumber(String.valueOf(orderId));
-        orders.setUserName(byId.getName());
+        if(byId != null){
+            orders.setUserName(byId.getName());
+        }else{
+            orders.setUserName(String.valueOf(employeeServiceById.getId()));
+        }
         orders.setConsignee(addressBook.getConsignee());
         orders.setPhone(addressBook.getPhone());
         orders.setAddress((addressBook.getProvinceName() == null ? "" : addressBook.getProvinceName())

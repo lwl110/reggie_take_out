@@ -7,19 +7,20 @@ import com.itheima.reggie.common.BaseContext;
 import com.itheima.reggie.common.R;
 import com.itheima.reggie.dto.DishDto;
 import com.itheima.reggie.dto.OrdersDto;
-import com.itheima.reggie.entity.Category;
-import com.itheima.reggie.entity.OrderDetail;
-import com.itheima.reggie.entity.Orders;
-import com.itheima.reggie.entity.User;
+import com.itheima.reggie.entity.*;
 import com.itheima.reggie.service.OrderDetailService;
 import com.itheima.reggie.service.OrdersService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.jaxb.SpringDataJaxb;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,8 +47,14 @@ public class OrdersController {
         return R.success("下单成功");
     }
 
+    /**
+     * 移动端分页查询订单
+     * @param page
+     * @param pageSize
+     * @return
+     */
     @GetMapping("/userPage")
-    public R<Page> page(int page,int pageSize){
+    public R<Page> userPage(int page,int pageSize){
         Page<Orders> ordersPage = new Page<>(page,pageSize);
         Page<OrdersDto> ordersDtoPage = new Page<>();
 
@@ -85,4 +92,73 @@ public class OrdersController {
 
         return R.success(ordersDtoPage);
     }
+
+    /**
+     * 客户端订单分页查询
+     * @param page
+     * @param pageSize
+     * @param number
+     * @return
+     */
+    @GetMapping("/page")
+    public R<Page> page(int page, int pageSize, Long number,String beginTime,String endTime){
+        Page<Orders> ordersPage = new Page<>(page, pageSize);
+        Page<OrdersDto> ordersDtoPage = new Page<>();
+
+        //当前登录用户id
+        Long id = BaseContext.getCurrentId();
+
+        LambdaQueryWrapper<Orders> eq = Wrappers.lambdaQuery(Orders.class)
+                .eq(Orders::getUserId,id)
+                .like(number != null, Orders::getNumber, number)
+                .between(beginTime!=null&&endTime!=null,Orders::getCheckoutTime,beginTime,endTime)
+                .orderByDesc(Orders::getOrderTime);
+
+        BeanUtils.copyProperties(ordersPage,ordersDtoPage);
+
+        ordersService.page(ordersPage,eq);
+
+        List<Orders> records = ordersPage.getRecords();
+
+        List<OrdersDto> list = records.stream().map((item) -> {
+            OrdersDto ordersDto = new OrdersDto();
+
+            //用户id
+            Long userId = item.getUserId();
+
+            LambdaQueryWrapper<OrderDetail> eq1 = Wrappers.lambdaQuery(OrderDetail.class)
+                    .eq(OrderDetail::getOrderId, userId);
+
+            List<OrderDetail> orderDetails = orderDetailService.list(eq1);
+            ordersDto.setOrderDetails(orderDetails);
+            BeanUtils.copyProperties(item,ordersDto);
+
+            return ordersDto;
+        }).collect(Collectors.toList());
+
+        ordersDtoPage.setRecords(list);
+
+        return R.success(ordersDtoPage);
+    }
+
+    /**
+     * 修改订单状态
+     * @param orders
+     * @return
+     */
+    @PutMapping
+    public R<String> update(@RequestBody Orders orders){
+        //获取当前登录用户id
+        Long currentId = BaseContext.getCurrentId();
+
+        LambdaQueryWrapper<Orders> eq = Wrappers.lambdaQuery(Orders.class)
+                .eq(currentId != null, Orders::getUserId, currentId)
+                .eq(orders.getNumber() != null, Orders::getNumber, orders.getNumber());
+
+        ordersService.update(orders,eq);
+
+        return R.success("订单已派送");
+    }
 }
+
+
