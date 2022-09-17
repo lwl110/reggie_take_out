@@ -168,19 +168,41 @@ public class DishController {
     }
 
     /**
-     * 商品起售停售功能 status：0 停售 1 起售
+     * 菜品起售停售功能 status：0 停售 1 起售
      * @param ids
      * @return
      */
-    @PostMapping("/status/${status}")
-    public R<String> status(@PathVariable int status,@PathVariable List<Long> ids){
+    @PostMapping("/status/{status}")
+    public R<String> status(@PathVariable int status,@RequestParam List<Long> ids){
+        ids.stream().forEach((item) -> {
             LambdaUpdateWrapper<Dish> set = Wrappers.lambdaUpdate(Dish.class)
-                    .eq(ids != null, Dish::getId, ids)
-                    .ne(Dish::getStatus,0)
-                    .set(Dish::getStatus, 0);
+                    .eq(item != null, Dish::getId, item);
 
-            dishService.update(set);
+            if(status == 0){
+                set.ne(Dish::getStatus,0).set(Dish::getStatus, 0);
 
-        return R.success("商品已更改为停售");
+                dishService.update(set);
+            }else{
+                set.ne(Dish::getStatus,1).set(Dish::getStatus, 1);
+
+                dishService.update(set);
+            }
+        });
+
+        return R.success("菜品已更改为停售");
+    }
+
+    /**
+     * 菜品删除
+     * @param ids
+     * @return
+     */
+    @DeleteMapping
+    public R<String> delete(@RequestParam List<Long> ids){
+        ids.stream().forEach((item) -> {
+            dishService.removeById(item);
+        });
+
+        return R.success("删除菜品成功");
     }
 }
