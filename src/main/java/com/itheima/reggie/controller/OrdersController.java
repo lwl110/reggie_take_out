@@ -1,6 +1,7 @@
 package com.itheima.reggie.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.itheima.reggie.common.BaseContext;
@@ -79,7 +80,7 @@ public class OrdersController {
             Long categoryId = item.getUserId();  //分类id
 
             LambdaQueryWrapper<OrderDetail> orderId = Wrappers.lambdaQuery(OrderDetail.class)
-                    .eq(OrderDetail::getOrderId, categoryId);
+                    .eq(OrderDetail::getOrderId, item.getNumber());
             //根据订单号查询分类对象
             List<OrderDetail> listOrderDetail = orderDetailService.list(orderId);
 
@@ -153,11 +154,52 @@ public class OrdersController {
 
         LambdaQueryWrapper<Orders> eq = Wrappers.lambdaQuery(Orders.class)
                 .eq(currentId != null, Orders::getUserId, currentId)
-                .eq(orders.getNumber() != null, Orders::getNumber, orders.getNumber());
+                .eq(orders.getId() != null, Orders::getNumber, orders.getId());
 
         ordersService.update(orders,eq);
 
         return R.success("订单已派送");
+    }
+
+    @PostMapping("/again")
+    public R<String> again(@RequestBody Orders orders){
+        //获取用户id
+        Long currentId = BaseContext.getCurrentId();
+
+        LambdaQueryWrapper<Orders> ordersEq = Wrappers.lambdaQuery(Orders.class)
+                .eq(currentId != null, Orders::getUserId, currentId)
+                .eq(orders.getId() != null,Orders::getNumber, orders.getId());
+
+        Orders one = ordersService.getOne(ordersEq);
+
+        long orderId = IdWorker.getId(); //自动生成订单号
+
+        Orders ordersCopy = new Orders();
+        OrderDetail orderDetail = new OrderDetail();
+
+        if(one != null){
+            LambdaQueryWrapper<OrderDetail> orderDetailEq = Wrappers.lambdaQuery(OrderDetail.class)
+                    .eq(one.getNumber() != null, OrderDetail::getOrderId, one.getNumber());
+
+            List<OrderDetail> list = orderDetailService.list(orderDetailEq);
+
+            list.stream().forEach((item) -> {
+                item.setOrderId(orderId);
+                BeanUtils.copyProperties(item,orderDetail,"id");
+
+                orderDetailService.save(orderDetail);
+            });
+
+            one.setId(orderId);
+            one.setNumber(String.valueOf(orderId));
+            one.setStatus(2);
+            String[] strings = {"orderTime", "checkoutTime"};
+            BeanUtils.copyProperties(one,ordersCopy,strings);
+        }
+
+        ordersService.save(ordersCopy);
+
+        return R.success("已成功追加订单");
     }
 }
 

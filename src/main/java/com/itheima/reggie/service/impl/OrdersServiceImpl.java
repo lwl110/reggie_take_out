@@ -73,9 +73,11 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
         //算总金额
         AtomicInteger amount = new AtomicInteger(0);
 
+        long orderId = IdWorker.getId(); //自动生成订单号
+
         List<OrderDetail> orderDetails = list.stream().map((item) -> {
             OrderDetail orderDetail = new OrderDetail();
-            orderDetail.setOrderId(currentId);
+            orderDetail.setOrderId(orderId);
             orderDetail.setNumber(item.getNumber());
             orderDetail.setDishFlavor(item.getDishFlavor());
             orderDetail.setDishId(item.getDishId());
@@ -88,7 +90,6 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders> impleme
             return orderDetail;
         }).collect(Collectors.toList());
 
-        long orderId = IdWorker.getId(); //自动生成订单号
         //向订单表插入数据
         orders.setId(orderId);
         orders.setStatus(2);
